@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎰 Mesin Penghibur Ultimate</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a1a;
+    --card: #12122a;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --accent4: #ef4444;
+    --accent5: #10b981;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --glow: 0 0 30px rgba(124, 58, 237, 0.3);
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 20% 50%, rgba(124,58,237,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6,182,212,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(245,158,11,0.06) 0%, transparent 50%);
+    animation: bgMove 20s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes bgMove {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(30px, -30px) rotate(1deg); }
+    66% { transform: translate(-20px, 20px) rotate(-1deg); }
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 30px 20px 10px;
+  }
+
+  .header h1 {
+    font-size: 2.2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    margin-bottom: 5px;
+  }
+
+  .header p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  /* Tab Navigation */
+  .tab-nav {
+    display: flex;
+    gap: 6px;
+    padding: 15px 15px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    padding: 10px 16px;
+    border: 2px solid rgba(124,58,237,0.3);
+    background: var(--card);
+    color: var(--text-dim);
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    transform: translateY(-2px);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--accent), #9333ea);
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--glow);
+    transform: translateY(-2px);
+  }
+
+  .tab-btn .emoji { font-size: 1.1rem; }
+
+  /* Content Area */
+  .content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px 15px 40px;
+  }
+
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .tab-content.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+  }
+
+  .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #9333ea); }
+  .btn-cyan { background: linear-gradient(135deg, var(--accent2), #0891b2); }
+  .btn-amber { background: linear-gradient(135deg, var(--accent3), #d97706); }
+  .btn-red { background: linear-gradient(135deg, var(--accent4), #dc2626); }
+  .btn-green { background: linear-gradient(135deg, var(--accent5), #059669); }
+
+  /* ===== SNAKE GAME ===== */
+  #snake-canvas {
+    background: #0d0d20;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 15px;
+    border: 2px solid rgba(124,58,237,0.3);
+    max-width: 100%;
+    touch-action: none;
+  }
+
+  .snake-controls {
+    display: grid;
+    grid-template-areas:
+      ". up ."
+      "left down right";
+    gap: 8px;
+    width: 160px;
+    margin: 0 auto;
+  }
+
+  .snake-controls button {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    border: 2px solid rgba(124,58,237,0.4);
+    background: var(--card);
+    color: white;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .snake-controls button:active {
+    background: var(--accent);
+    transform: scale(0.9);
+  }
+
+  .ctrl-up { grid-area: up; }
+  .ctrl-down { grid-area: down; }
+  .ctrl-left { grid-area: left; }
+  .ctrl-right { grid-area: right; }
+
+  .score-display {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 10px;
+  }
+
+  /* ===== CANVAS DRAW ===== */
+  #draw-canvas {
+    background: #ffffff;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 15px;
+    cursor: crosshair;
+    max-width: 100%;
+    touch-action: none;
+  }
+
+  .draw-tools {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .color-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .color-btn:hover, .color-btn.active {
+    border-color: white;
+    transform: scale(1.2);
+  }
+
+  .size-slider {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    display: block;
+    accent-color: var(--accent);
+  }
+
+  /* ===== JOKES ===== */
+  .joke-box {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.1));
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    border: 1px solid rgba(124,58,237,0.2);
+  }
+
+  .joke-box .punchline {
+    color: var(--accent3);
+    font-weight: 700;
+    display: block;
+    margin-top: 10px;
+    font-size: 1.2rem;
+  }
+
+  /* ===== PIANO ===== */
+  .piano-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    position: relative;
+    height: 180px;
+    overflow-x: auto;
+  }
+
+  .piano-key {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .white-key {
+    width: 48px;
+    height: 170px;
+    background: linear-gradient(180deg, #f8f8f8, #e8e8e8);
+    border: 1px solid #ccc;
+    border-radius: 0 0 8px 8px;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    font-size: 0.7rem;
+    color: #999;
+    font-weight: 600;
+  }
+
+  .white-key:active, .white-key.pressed {
+    background: linear-gradient(180deg, #e0e0ff, #c8c8f0);
+    transform: scaleY(0.98);
+    transform-origin: top;
+  }
+
+  .black-key {
+    width: 32px;
+    height: 110px;
+    background: linear-gradient(180deg, #333, #111);
+    border-radius: 0 0 6px 6px;
+    margin-left: -16px;
+    margin-right: -16px;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    font-size: 0.6rem;
+    color: #666;
+    font-weight: 600;
+  }
+
+  .black-key:active, .black-key.pressed {
+    background: linear-gradient(180deg, #555, #333);
+    height: 105px;
+  }
+
+  /* ===== MAGIC BALL ===== */
+  .crystal-ball {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(124,58,237,0.4), rgba(15,15,40,0.95));
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #c4b5fd;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 60px rgba(124,58,237,0.3), inset 0 0 60px rgba(124,58,237,0.1);
+    line-height: 1.4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crystal-ball::before {
+    content: '';
+    position: absolute;
+    top: 15%; left: 20%;
+    width: 30%; height: 20%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.3), transparent);
+    border-radius: 50%;
+    transform: rotate(-30deg);
+  }
+
+  .crystal-ball:hover {
+    box-shadow: 0 0 80px rgba(124,58,237,0.5), inset 0 0 80px rgba(124,58,237,0.2);
+    transform: scale(1.05);
+  }
+
+  .crystal-ball.shaking {
+    animation: shake 0.5s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-8px) rotate(-3deg); }
+    40% { transform: translateX(8px) rotate(3deg); }
+    60% { transform: translateX(-5px) rotate(-2deg); }
+    80% { transform: translateX(5px) rotate(2deg); }
+  }
+
+  .fortune-input {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(124,58,237,0.3);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .fortune-input:focus { border-color: var(--accent); }
+  .fortune-input::placeholder { color: var(--text-dim); }
+
+  /* ===== CLICK SPEED ===== */
+  .click-area {
+    width: 100%;
+    height: 250px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(245,158,11,0.15));
+    border: 2px dashed rgba(239,68,68,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 15px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .click-area:active {
+    transform: scale(0.97);
+    background: linear-gradient(135deg, rgba(239,68,68,0.3), rgba(245,158,11,0.3));
+  }
+
+  .click-area .big-num {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent4), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .click-area .label { color: var(--text-dim); font-size: 0.9rem; }
+
+  .stats-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+
+  .stat-box {
+    background: rgba(255,255,255,0.05);
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .stat-box .val {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .stat-box .lbl {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent4), var(--accent3));
+    border-radius: 10px;
+    transition: width 0.1s linear;
+    width: 100%;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.6rem; }
+    .tab-btn { padding: 8px 12px; font-size: 0.72rem; }
+    .card { padding: 18px; }
+    .white-key { width: 38px; height: 140px; }
+    .black-key { width: 26px; height: 90px; margin-left: -13px; margin-right: -13px; }
+    .crystal-ball { width: 160px; height: 160px; font-size: 0.85rem; }
+  }
+
+  /* Particles for click game */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent3);
+    z-index: 999;
+    animation: particleFly 0.8s ease-out forwards;
+  }
+
+  @keyframes particleFly {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.5); }
+  }
+
+  .center-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎰 Mesin Penghibur</h1>
+  <p>Obat anti bosan paling ampuh se-galaksi 🚀</p>
+</div>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('snake')"><span class="emoji">🐍</span> Snake</button>
+  <button class="tab-btn" onclick="switchTab('draw')"><span class="emoji">🎨</span> Gambar</button>
+  <button class="tab-btn" onclick="switchTab('jokes')"><span class="emoji">😂</span> Lawakan</button>
+  <button class="tab-btn" onclick="switchTab('piano')"><span class="emoji">🎹</span> Piano</button>
+  <button class="tab-btn" onclick="switchTab('crystal')"><span class="emoji">🔮</span> Ramalan</button>
+  <button class="tab-btn" onclick="switchTab('click')"><span class="emoji">👆</span> Klik Cepat</button>
+</nav>
+
+<div class="content">
+
+  <!-- ===== SNAKE GAME ===== -->
+  <div id="tab-snake" class="tab-content active">
+    <div class="card">
+      <h2>🐍 Snake Game</h2>
+      <div class="score-display">Skor: <span id="snake-score">0</span> | Terbaik: <span id="snake-best">0</span></div>
+      <canvas id="snake-canvas" width="400" height="400"></canvas>
+      <div class="center-btns" style="margin-bottom:15px">
+        <button class="btn btn-primary" onclick="startSnake()">▶ Mulai</button>
+      </div>
+      <div class="snake-controls">
+        <button class="ctrl-up" onclick="setDir(0,-1)">⬆</button>
+        <button class="ctrl-left" onclick="setDir(-1,0)">⬅</button>
+        <button class="ctrl-down" onclick="setDir(0,1)">⬇</button>
+        <button class="ctrl-right" onclick="setDir(1,0)">➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DRAW ===== -->
+  <div id="tab-draw" class="tab-content">
+    <div class="card">
+      <h2>🎨 Kanvas Ajaib</h2>
+      <div class="draw-tools" id="color-palette"></div>
+      <input type="range" class="size-slider" id="brush-size" min="2" max="40" value="5">
+      <canvas id="draw-canvas" width="700" height="450"></canvas>
+      <div class="center-btns">
+        <button class="btn btn-red" onclick="clearCanvas()">🗑 Hapus</button>
+        <button class="btn btn-green" onclick="saveCanvas()">💾 Simpan</button>
+        <button class="btn btn-amber" onclick="toggleEraser()">🧹 Penghapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JOKES ===== -->
+  <div id="tab-jokes" class="tab-content">
+    <div class="card">
+      <h2>😂 Generator Lawakan</h2>
+      <div class="joke-box" id="joke-box">
+        Tekan tombol di bawah untuk mendapatkan lawakan segar! 🎤
+      </div>
+      <div class="center-btns">
+        <button class="btn btn-amber" onclick="newJoke()">🎲 Lawakan Baru!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PIANO ===== -->
+  <div id="tab-piano" class="tab-content">
+    <div class="card">
+      <h2>🎹 Piano Mini</h2>
+      <p style="text-align:center;color:var(--text-dim);margin-bottom:5px;font-size:0.85rem">Klik tuts atau tekan keyboard (A S D F G H J K)</p>
+      <div class="piano-container" id="piano-container"></div>
+    </div>
+  </div>
+
+  <!-- ===== CRYSTAL BALL ===== -->
+  <div id="tab-crystal" class="tab-content">
+    <div class="card">
+      <h2>🔮 Bola Kristal Ajaib</h2>
+      <p style="text-align:center;color:var(--text-dim);margin-bottom:15px;font-size:0.9rem">Tanyakan apapun, lalu klik bola kristal...</p>
+      <input type="text" class="fortune-input" id="fortune-q" placeholder="Ketik pertanyaanmu di sini...">
+      <div class="crystal-ball" id="crystal-ball" onclick="shakeBall()">
+        ✨ Klik aku ✨
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLICK SPEED ===== -->
+  <div id="tab-click" class="tab-content">
+    <div class="card">
+      <h2>👆 Uji Kecepatan Klik</h2>
+      <div class="progress-bar"><div class="fill" id="click-timer-bar"></div></div>
+      <div class="click-area" id="click-area" onclick="handleClick(event)">
+        <div class="big-num" id="click-count">0</div>
+        <div class="label" id="click-label">Klik untuk mulai! (10 detik)</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="val" id="cps-val">0</div><div class="lbl">Klik/detik</div></div>
+        <div class="stat-box"><div class="val" id="best-cps">0</div><div class="lbl">Terbaik</div></div>
+        <div class="stat-box"><div class="val" id="rank-val">-</div><div class="lbl">Rank</div></div>
+      </div>
+      <div class="center-btns">
+        <button class="btn btn-red" onclick="resetClick()">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== TAB SWITCHING =====
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'snake') initSnakeCanvas();
+}
+
+// ===== SNAKE GAME =====
+const snakeCanvas = document.getElementById('snake-canvas');
+const sCtx = snakeCanvas.getContext('2d');
+const GRID = 20;
+let snake, food, dir, nextDir, score, bestScore = 0, snakeLoop, gameRunning = false;
+
+function initSnakeCanvas() {
+  const w = Math.min(400, snakeCanvas.parentElement.clientWidth - 50);
+  snakeCanvas.width = Math.floor(w / GRID) * GRID;
+  snakeCanvas.height = snakeCanvas.width;
+  if (!gameRunning) drawSnakeIdle();
+}
+
+function drawSnakeIdle() {
+  sCtx.fillStyle = '#0d0d20';
+  sCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+  sCtx.fillStyle = '#7c3aed44';
+  sCtx.font = '16px Poppins';
+  sCtx.textAlign = 'center';
+  sCtx.fillText('Tekan "Mulai" untuk bermain', snakeCanvas.width/2, snakeCanvas.height/2);
+}
+
+function startSnake() {
+  if (snakeLoop) clearInterval(snakeLoop);
+  const cols = snakeCanvas.width / GRID;
+  const rows = snakeCanvas.height / GRID;
+  snake = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}];
+  dir = {x: 1, y: 0};
+  nextDir = {x: 1, y: 0};
+  score = 0;
+  document.getElementById('snake-score').textContent = 0;
+  placeFood();
+  gameRunning = true;
+  snakeLoop = setInterval(updateSnake, 120);
+}
+
+function placeFood() {
+  const cols = snakeCanvas.width / GRID;
+  const rows = snakeCanvas.height / GRID;
+  do {
+    food = {x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
+  } while (snake.some(s => s.x === food.x && s.y === food.y));
+}
+
+function setDir(x, y) {
+  if (x === -dir.x && y === 0 && dir.x !== 0) return;
+  if (y === -dir.y && x === 0 && dir.y !== 0) return;
+  nextDir = {x, y};
+}
+
+function updateSnake() {
+  dir = {...nextDir};
+  const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+  const cols = snakeCanvas.width / GRID;
+  const rows = snakeCanvas.height / GRID;
+
+  if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
+    clearInterval(snakeLoop);
+    gameRunning = false;
+    if (score > bestScore) { bestScore = score; document.getElementById('snake-best').textContent = bestScore; }
+    sCtx.fillStyle = 'rgba(0,0,0,0.7)';
+    sCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+    sCtx.fillStyle = '#ef4444';
+    sCtx.font = 'bold 22px Poppins';
+    sCtx.textAlign = 'center';
+    sCtx.fillText('Game Over!', snakeCanvas.width/2, snakeCanvas.height/2 - 10);
+    sCtx.fillStyle = '#f59e0b';
+    sCtx.font = '16px Poppins';
+    sCtx.fillText('Skor: ' + score, snakeCanvas.width/2, snakeCanvas.height/2 + 20);
+    return;
+  }
+
+  snake.unshift(head);
+  if (head.x === food.x && head.y === food.y) {
+    score++;
+    document.getElementById('snake-score').textContent = score;
+    placeFood();
+  } else {
+    snake.pop();
+  }
+
+  // Draw
+  sCtx.fillStyle = '#0d0d20';
+  sCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+  // Grid lines
+  sCtx.strokeStyle = 'rgba(124,58,237,0.07)';
+  for (let i = 0; i < cols; i++) { sCtx.beginPath(); sCtx.moveTo(i*GRID,0); sCtx.lineTo(i*GRID,snakeCanvas.height); sCtx.stroke(); }
+  for (let i = 0; i < rows; i++) { sCtx.beginPath(); sCtx.moveTo(0,i*GRID); sCtx.lineTo(snakeCanvas.width,i*GRID); sCtx.stroke(); }
+
+  // Food
+  sCtx.fillStyle = '#ef4444';
+  sCtx.shadowColor = '#ef4444';
+  sCtx.shadowBlur = 15;
+  sCtx.beginPath();
+  sCtx.arc(food.x*GRID+GRID/2, food.y*GRID+GRID/2, GRID/2-2, 0, Math.PI*2);
+  sCtx.fill();
+  sCtx.shadowBlur = 0;
+
+  // Snake
+  snake.forEach((s, i) => {
+    const ratio = 1 - i / snake.length;
+    sCtx.fillStyle = `hsl(${270 - i * 3}, 80%, ${50 + ratio * 20}%)`;
+    sCtx.shadowColor = '#7c3aed';
+    sCtx.shadowBlur = i === 0 ? 12 : 4;
+    sCtx.beginPath();
+    sCtx.roundRect(s.x*GRID+1, s.y*GRID+1, GRID-2, GRID-2, 4);
+    sCtx.fill();
+  });
+  sCtx.shadowBlur = 0;
+}
+
+document.addEventListener('keydown', e => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+  if (e.key === 'ArrowUp') setDir(0, -1);
+  if (e.key === 'ArrowDown') setDir(0, 1);
+  if (e.key === 'ArrowLeft') setDir(-1, 0);
+  if (e.key === 'ArrowRight') setDir(1, 0);
+});
+
+// Swipe support
+let touchStartX, touchStartY;
+snakeCanvas.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; });
+snakeCanvas.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy)) { setDir(dx > 0 ? 1 : -1, 0); }
+  else { setDir(0, dy > 0 ? 1 : -1); }
+});
+
+initSnakeCanvas();
+drawSnakeIdle();
+
+// ===== DRAWING CANVAS =====
+const drawCanvas = document.getElementById('draw-canvas');
+const dCtx = drawCanvas.getContext('2d');
+let drawing = false, eraserMode = false;
+let currentColor = '#7c3aed';
+
+const colors = ['#7c3aed','#06b6d4','#f59e0b','#ef4444','#10b981','#ec4899','#ffffff','#1e293b','#f97316','#6366f1'];
+const palette = document.getElementById('color-palette');
+colors.forEach((c, i) => {
+  const btn = document.createElement('div');
+  btn.className = 'color-btn' + (i === 0 ? ' active' : '');
+  btn.style.background = c;
+  if (c === '#ffffff') btn.style.border = '3px solid #555';
+  btn.onclick = () => {
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentColor = c;
+    eraserMode = false;
+  };
+  palette.appendChild(btn);
+});
+
+function resizeDrawCanvas() {
+  const w = Math.min(700, drawCanvas.parentElement.clientWidth - 50);
+  drawCanvas.width = w;
+  drawCanvas.height = Math.floor(w * 0.64);
+  dCtx.fillStyle = '#ffffff';
+  dCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
+}
+resizeDrawCanvas();
+
+function getPos(e) {
+  const rect = drawCanvas.getBoundingClientRect();
+  const scaleX = drawCanvas.width / rect.width;
+  const scaleY = drawCanvas.height / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+drawCanvas.addEventListener('mousedown', e => { drawing = true; dCtx.beginPath(); const p = getPos(e); dCtx.moveTo(p.x, p.y); });
+drawCanvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); draw(p); });
+drawCanvas.addEventListener('mouseup', () => drawing = false);
+drawCanvas.addEventListener('mouseleave', () => drawing = false);
+drawCanvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; dCtx.beginPath(); const p = getPos(e); dCtx.moveTo(p.x, p.y); });
+drawCanvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); draw(p); });
+drawCanvas.addEventListener('touchend', () => drawing = false);
+
+function draw(p) {
+  dCtx.lineWidth = document.getElementById('brush-size').value;
+  dCtx.lineCap = 'round';
+  dCtx.lineJoin = 'round';
+  dCtx.strokeStyle = eraserMode ? '#ffffff' : currentColor;
+  dCtx.lineTo(p.x, p.y);
+  dCtx.stroke();
+}
+
+function clearCanvas() { dCtx.fillStyle = '#ffffff'; dCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height); }
+function saveCanvas() {
+  const a = document.createElement('a');
+  a.download = 'karya-ajaib.png';
+  a.href = drawCanvas.toDataURL();
+  a.click();
+}
+function toggleEraser() { eraserMode = !eraserMode; }
+
+// ===== JOKES =====
+const jokes = [
+  { q: "Kenapa ayam menyeberang jalan?", p: "Karena dia belum bisa naik ojol! 🐔" },
+  { q: "Apa bedanya soto sama coto?", p: "Kalau soto dari Jakarta, kalau coto... dari Makassar lah! 😂" },
+  { q: "Kenapa programmer suka gelap?", p: "Karena mereka benci BUGS yang datang ke cahaya! 🪲" },
+  { q: "Ikan apa yang bisa berhenti?", p: "Ikan pause! ⏸️🐟" },
+  { q: "Kenapa matematika sedih?", p: "Karena terlalu banyak masalah! 📐😢" },
+  { q: "Apa bahasa Jepangnya 'tidak punya uang'?", p: "Sakura... soalnya sakura dompet! 🌸💸" },
+  { q: "Gajah apa yang paling baik hati?", p: "Gajahat... eh bukan, gajah baik! 🐘" },
+  { q: "Kenapa WiFi putus-nyambung?", p: "Karena dia lagi galau sama modem! 📶💔" },
+  { q: "Sayur apa yang jago nyanyi?", p: "Kol... kooooolaaa! 🥬🎤" },
+  { q: "Kenapa kucing takut sama anjing?", p: "Karena anjing punya 'bark'code yang lebih kuat! 🐱🐶" },
+  { q: "Apa persamaan tukang sate sama programmer?", p: "Sama-sama tusuk-tusuk... eh, satu pakai tusuk sate, satu pakai keyboard! 🍢⌨️" },
+  { q: "Kenapa zombie kalau nyerang bareng-bareng?", p: "Karena kalau sendiri namanya zomblo! 🧟" },
+  { q: "Buah apa yang nggak punya otak?", p: "Semua buah... kan buah! 🍉🧠" },
+  { q: "Kenapa superman bajunya ada huruf S?", p: "Karena kalau M atau XL kegedean! 🦸" },
+  { q: "Apa bedanya sekolah sama penjara?", p: "Kalau penjara ada keluar masuknya jelas, kalau sekolah... PR-nya nggak ada habisnya! 📚" },
+  { q: "Kenapa keyboard komputer hurufnya nggak urut?", p: "Karena kalau urut, kamu ngetiknya terlalu cepat dan nggak ada yang bisa baca! ⌨️" },
+  { q: "Hewan apa yang paling hening?", p: "Semut... soalnya nggak pernah 'semut' (sebut) namanya sendiri! 🐜" },
+  { q: "Kenapa nasi goreng enak?", p: "Karena kalau nggak enak, namanya nasi gagal! 🍳" },
+];
+
+function newJoke() {
+  const j = jokes[Math.floor(Math.random() * jokes.length)];
+  const box = document.getElementById('joke-box');
+  box.style.opacity = 0;
+  setTimeout(() => {
+    box.innerHTML = j.q + '<span class="punchline">' + j.p + '</span>';
+    box.style.opacity = 1;
+  }, 200);
+}
+
+// ===== PIANO =====
+const pianoNotes = [
+  { note: 'C4', freq: 261.63, type: 'white', key: 'a' },
+  { note: 'C#4', freq: 277.18, type: 'black', key: 'w' },
+  { note: 'D4', freq: 293.66, type: 'white', key: 's' },
+  { note: 'D#4', freq: 311.13, type: 'black', key: 'e' },
+  { note: 'E4', freq: 329.63, type: 'white', key: 'd' },
+  { note: 'F4', freq: 349.23, type: 'white', key: 'f' },
+  { note: 'F#4', freq: 369.99, type: 'black', key: 't' },
+  { note: 'G4', freq: 392.00, type: 'white', key: 'g' },
+  { note: 'G#4', freq: 415.30, type: 'black', key: 'y' },
+  { note: 'A4', freq: 440.00, type: 'white', key: 'h' },
+  { note: 'A#4', freq: 466.16, type: 'black', key: 'u' },
+  { note: 'B4', freq: 493.88, type: 'white', key: 'j' },
+  { note: 'C5', freq: 523.25, type: 'white', key: 'k' },
+];
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const pianoContainer = document.getElementById('piano-container');
+
+pianoNotes.forEach(n => {
+  const key = document.createElement('div');
+  key.className = `piano-key ${n.type}-key`;
+  key.textContent = n.key.toUpperCase();
+  key.dataset.freq = n.freq;
+  key.dataset.note = n.note;
+
+  const playNote = () => {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = n.freq;
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.8);
+    key.classList.add('pressed');
+    setTimeout(() => key.classList.remove('pressed'), 200);
+  };
+
+  key.addEventListener('mousedown', playNote);
+  key.addEventListener('touchstart', e => { e.preventDefault(); playNote(); });
+  pianoContainer.appendChild(key);
+});
+
+document.addEventListener('keydown', e => {
+  const note = pianoNotes.find(n => n.key === e.key.toLowerCase());
+  if (note) {
+    const keyEl = pianoContainer.querySelector(`[data-note="${note.note}"]`);
+    if (keyEl) keyEl.dispatchEvent(new Event('mousedown'));
+  }
+});
+
+// ===== CRYSTAL BALL =====
+const fortunes = [
+  "✨ Ya, pasti bisa! Semesta mendukungmu!",
+  "🌟 Tunggu 3 hari lagi, kejutan datang!",
+  "😏 Hmm... coba tanya lagi dengan lebih sopan.",
+  "🎯 Tanda-tandanya sangat positif!",
+  "🤔 Jawabannya ada di dalam hatimu... dan di kulkas.",
+  "💫 Belum saatnya, sabar ya bestie!",
+  "🔥 YES! Gas terus jangan mundur!",
+  "🌈 Setelah hujan, pelangi menunggumu!",
+  "😴 Kamu terlalu overthinking, tidur dulu gih!",
+  "🎲 50:50... tapi aku rooting buat kamu!",
+  "🦋 Perubahan besar akan datang minggu ini!",
+  "💰 Rezeki nggak kemana, tapi kamu harus jemput!",
+  "🐢 Pelan-pelan asal selamat, jangan ngebut!",
+  "🎪 Hidupmu akan se-seru roller coaster!",
+  "🍀 Keberuntungan ada di sudut yang tak terduga!",
+  "🧠 Pikirkan lagi... kamu sudah tahu jawabannya.",
+  "🚀 Ini saatnya ambil risiko besar!",
+  "🌙 Malam ini mimpi indah akan memberimu petunjuk.",
+  "🎵 Dengarkan lagu favoritmu, jawabannya ada di liriknya.",
+  "🤷 Aku bola kristal, bukan Google... tapi jawabannya YA!",
+];
+
+function shakeBall() {
+  const ball = document.getElementById('crystal-ball');
+  ball.classList.add('shaking');
+  ball.textContent = '🌀 ...';
+  setTimeout(() => {
+    ball.classList.remove('shaking');
+    ball.textContent = fortunes[Math.floor(Math.random() * fortunes.length)];
+  }, 600);
+}
+
+// ===== CLICK SPEED =====
+let clickCount = 0, clickStarted = false, clickTimer = null, clickTimeLeft = 10, bestCPS = 0;
+
+function handleClick(e) {
+  if (!clickStarted) {
+    clickStarted = true;
+    clickCount = 0;
+    clickTimeLeft = 10;
+    document.getElementById('click-label').textContent = 'KLIK CEPAT!! 🔥';
+    clickTimer = setInterval(() => {
+      clickTimeLeft -= 0.1;
+      document.getElementById('click-timer-bar').style.width = (clickTimeLeft / 10 * 100) + '%';
+      if (clickTimeLeft <= 0) {
+        clearInterval(clickTimer);
+        clickStarted = false;
+        const cps = (clickCount / 10).toFixed(1);
+        document.getElementById('cps-val').textContent = cps;
+        document.getElementById('click-label').textContent = 'Selesai! Klik untuk coba lagi';
+        if (parseFloat(cps) > bestCPS) {
+          bestCPS = parseFloat(cps);
+          document.getElementById('best-cps').textContent = bestCPS;
+        }
+        // Rank
+        const c = parseFloat(cps);
+        let rank = '🐌 Siput';
+        if (c >= 12) rank = '⚡ Dewa Petir';
+        else if (c >= 10) rank = '🔥 Legendaris';
+        else if (c >= 8) rank = '🚀 Super Cepat';
+        else if (c >= 6) rank = '🐇 Kelinci';
+        else if (c >= 4) rank = '🐕 Anjing';
+        else if (c >= 2) rank = '🐢 Kura-kura';
+        document.getElementById('rank-val').textContent = rank;
+      }
+    }, 100);
+  }
+
+  if (clickTimeLeft > 0) {
+    clickCount++;
+    document.getElementById('click-count').textContent = clickCount;
+    // Particle
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = '+1';
+    p.style.left = e.clientX + 'px';
+    p.style.top = e.clientY + 'px';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
+}
+
+function resetClick() {
+  clearInterval(clickTimer);
+  clickStarted = false;
+  clickCount = 0;
+  clickTimeLeft = 10;
+  document.getElementById('click-count').textContent = '0';
+  document.getElementById('click-label').textContent = 'Klik untuk mulai! (10 detik)';
+  document.getElementById('click-timer-bar').style.width = '100%';
+  document.getElementById('cps-val').textContent = '0';
+  document.getElementById('rank-val').textContent = '-';
+}
+
+// roundRect polyfill
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = [r,r,r,r];
+    this.moveTo(x + r[0], y);
+    this.lineTo(x + w - r[1], y);
+    this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+    this.lineTo(x + w, y + h - r[2]);
+    this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+    this.lineTo(x + r[3], y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+    this.lineTo(x, y + r[0]);
+    this.quadraticCurveTo(x, y, x + r[0], y);
+    this.closePath();
+  };
+}
+</script>
+</body>
+</html>
